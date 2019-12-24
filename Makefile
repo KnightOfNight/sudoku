@@ -1,5 +1,5 @@
 
-all : csudoku gsudoku sudoku.class
+all : csudoku gsudoku sudoku.class sudoku.pyc
 
 csudoku : sudoku.c
 	@cc -o csudoku -Wall sudoku.c
@@ -10,11 +10,16 @@ gsudoku : sudoku.go
 sudoku.class: sudoku.java
 	@javac sudoku.java
 
+sudoku.pyc: sudoku.py
+	@python3 -c "import py_compile; py_compile.compile('sudoku.py', cfile='sudoku.pyc', doraise=True)"
+
 clean : 
 	@echo "removing binaries"
-	@rm -vf csudoku gsudoku sudoku.class 2>/dev/null
+	@rm -vf csudoku gsudoku sudoku.class sudoku.pyc 2>/dev/null
 
-testall : all
+quicktest : all
+	@echo
+	@echo "quick test"
 	@echo
 	@echo "testing go"
 	@./gsudoku --sample
@@ -29,14 +34,19 @@ testall : all
 	@./psudoku --sample
 	@echo
 
-fullrunfast : all
+longtest: all
+	@echo
+	@echo "long test"
 	@echo
 	@echo "testing go"
-	@time ./gsudoku --quiet
+	@./gsudoku | grep -v "time elapsed" > g-sol.txt
 	@echo
 	@echo "testing c"
-	@time ./csudoku --quiet
+	@./csudoku | grep -v "time elapsed" > c-sol.txt
 	@echo
 	@echo "testing java"
-	@time ./jsudoku --quiet
+	@./jsudoku | grep -v "time elapsed" > j-sol.txt
+	@echo
+	@echo "testing python"
+	@./psudoku | grep -v "time elapsed" > p-sol.txt
 	@echo
