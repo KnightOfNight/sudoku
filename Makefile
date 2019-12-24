@@ -16,6 +16,8 @@ sudoku.pyc: sudoku.py
 clean : 
 	@echo "removing binaries"
 	@rm -vf csudoku gsudoku sudoku.class sudoku.pyc 2>/dev/null
+	@echo "removing test results"
+	@rm -vf *-sol.txt 2>/dev/null
 
 quicktest : all
 	@echo
