@@ -120,6 +120,16 @@ func str_to_grid(grid [][]int, grid_str string) {
     }
 }
 
+func print_solution(grid [][]int) {
+    fmt.Printf("solution: ")
+    for r := 0; r < _SIZE; r++ {
+        for c := 0; c < _SIZE; c++ {
+            fmt.Printf("%d", grid[r][c])
+        }
+    }
+    fmt.Printf("\n")
+}
+
 func readlines(filename string) []string {
     bytes,_ := ioutil.ReadFile(filename)
     lines := strings.Split(strings.TrimSpace(string(bytes)), "\n")
@@ -165,6 +175,7 @@ func main() {
     if sample {
         fmt.Printf("puzzle: sample\n")
         timed_solve(sample_grid, false)
+        print_solution(sample_grid)
         os.Exit(0)
     }
 
@@ -176,6 +187,9 @@ func main() {
             fmt.Printf("puzzle: %s\n", line)
         }
         timed_solve(grid, quiet)
+        if ! quiet {
+            print_solution(grid)
+        }
     }
 
     os.Exit(0)

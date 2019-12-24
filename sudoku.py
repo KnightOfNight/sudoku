@@ -76,6 +76,13 @@ def str_to_grid(grid, grid_str):
             c = 0
             r += 1
 
+def print_solution(grid):
+    sys.stdout.write("solution: ")
+    for r in range(_SIZE):
+        for c in range(_SIZE):
+            sys.stdout.write(str(grid[r][c]))
+    print()
+
 def main():
     sample_grid = [
         [5, 3, 0, 0, 7, 0, 0, 0, 0],
@@ -109,6 +116,7 @@ def main():
     if args.sample:
         print("puzzle: sample")
         timed_solve(sample_grid, False)
+        print_solution(sample_grid)
         sys.exit(0)
 
     with open("sudoku.txt", "r") as f:
@@ -117,6 +125,8 @@ def main():
             if not args.quiet:
                 print("puzzle: %s" % line.strip())
             timed_solve(grid, args.quiet)
+            if not args.quiet:
+                print_solution(grid)
             
     sys.exit(0)
 

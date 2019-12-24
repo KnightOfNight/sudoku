@@ -125,6 +125,16 @@ void str_to_grid(int grid[SIZE][SIZE], char grid_str[256]) {
     }
 }
 
+void print_solution(int grid[SIZE][SIZE]) {
+    printf("solution: ");
+    for (int r = 0; r < SIZE; r++) {
+        for (int c = 0; c < SIZE; c++) {
+            printf("%d", grid[r][c]);
+        }
+    }
+    printf("\n");
+}
+
 int main(int argc, char *argv[]) {
     int sample_grid[SIZE][SIZE] = {
         {5, 3, 0, 0, 7, 0, 0, 0, 0},
@@ -164,6 +174,7 @@ int main(int argc, char *argv[]) {
     if (sample) {
         printf("puzzle: sample\n");
         timed_solve(sample_grid, 0);
+        print_solution(sample_grid);
         return(0);
     }
 
@@ -178,6 +189,9 @@ int main(int argc, char *argv[]) {
             printf("puzzle: %s", line);
         }
         timed_solve(grid, quiet);
+        if (! quiet) {
+            print_solution(grid);
+        }
     }
 
     return(0);

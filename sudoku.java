@@ -122,6 +122,16 @@ class sudoku {
         }
     }
 
+    public static void print_solution(int grid[][]) {
+        System.out.printf("solution: ");
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                System.out.printf("%d", grid[r][c]);
+            }
+        }
+        System.out.printf("\n");
+    }
+
     public static String[] readlines(String filename) throws Exception {
         String line = new String(Files.readAllBytes(Paths.get(filename)));
         line = line.trim();
@@ -168,6 +178,7 @@ class sudoku {
         if (sample) {
             System.out.printf("puzzle: sample\n");
             timed_solve(sample_grid, false);
+            print_solution(sample_grid);
             return;
         }
 
@@ -185,6 +196,9 @@ class sudoku {
                 System.out.printf("puzzle: %s\n", line);
             }
             timed_solve(grid, quiet);
+            if (! quiet) {
+                print_solution(grid);
+            }
         }
 
         return;
