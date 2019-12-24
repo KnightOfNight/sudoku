@@ -14,7 +14,7 @@ clean :
 	@echo "removing binaries"
 	@rm -vf csudoku gsudoku sudoku.class 2>/dev/null
 
-test : all
+testall : all
 	@echo
 	@echo "testing go"
 	@./gsudoku --sample
@@ -29,7 +29,7 @@ test : all
 	@./psudoku --sample
 	@echo
 
-full : all
+fullrunfast : all
 	@echo
 	@echo "testing go"
 	@time ./gsudoku --quiet
@@ -39,7 +39,4 @@ full : all
 	@echo
 	@echo "testing java"
 	@time ./jsudoku --quiet
-	@echo
-	@echo "testing python"
-	@time ./psudoku --quiet
 	@echo
