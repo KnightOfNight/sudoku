@@ -13,38 +13,42 @@ cleanbin:
 
 cleanreports: 
 	@echo "removing reports"
-	@rm -vf *-sol.txt 2>/dev/null
+	@rm -f *-sol.txt 2>/dev/null
 
 csudoku: sudoku.c
 	@echo "compiling csudoku"
 	@cc -o csudoku -Wall sudoku.c
+	@rm -f c-sol.txt 2>/dev/null
 
 gsudoku: sudoku.go
 	@echo "compiling gsudoku"
 	@go build -o gsudoku sudoku.go
+	@rm -f g-sol.txt 2>/dev/null
 
 sudoku.class: sudoku.java
 	@echo "compiling jsudoku"
 	@javac sudoku.java
+	@rm -f j-sol.txt 2>/dev/null
 
 sudoku.pyc: sudoku.py
 	@echo "compiling psudoku"
 	@python3 -c "import py_compile; py_compile.compile('sudoku.py', cfile='sudoku.pyc', doraise=True)"
+	@rm -f p-sol.txt 2>/dev/null
 
 c-sol.txt:
-	@echo "running csudoku"
+	@echo "getting csudoku report"
 	@./csudoku > c-sol.txt
 
 g-sol.txt:
-	@echo "running gsudoku"
+	@echo "getting gsudoku report"
 	@./gsudoku > g-sol.txt
 
 j-sol.txt:
-	@echo "running jsudoku"
+	@echo "getting jsudoku report"
 	@./jsudoku > j-sol.txt
 
 sample: all
-	@echo "sample puzzle tested on all languages"
+	@echo "sample puzzle test: all languages"
 	@echo "language: c"
 	@./csudoku --sample
 	@echo "language: go"
@@ -54,8 +58,8 @@ sample: all
 	@echo "language: python"
 	@./psudoku --sample
 
-summary: all reports
-	@echo "summary on (fast) languages"
+summary: reports
+	@echo "report summary:  fast languages"
 	@echo "language: c"
 	@tail -2 c-sol.txt
 	@echo "language: go"
