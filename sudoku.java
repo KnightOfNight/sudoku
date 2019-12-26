@@ -169,7 +169,7 @@ class sudoku {
 
         if (! quiet) {
             if (solved) {
-                System.out.printf("puzz : %s\n", grid_to_str(grid));
+                System.out.printf("solu : %s\n", grid_to_str(grid));
             } else {
                 System.out.printf("stat : not solved\n");
             }
