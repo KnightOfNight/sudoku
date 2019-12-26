@@ -220,8 +220,8 @@ class sudoku {
 
         double diff = end - start;
 
-        System.out.printf("puzzles: %d\n", count);
-        System.out.printf("total time elapsed: %.6f\n", diff);
+        System.out.printf("total puzz : %d\n", count);
+        System.out.printf("total time : %.6f\n", diff);
 
         return;
     }

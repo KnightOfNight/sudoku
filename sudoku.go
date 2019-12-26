@@ -212,8 +212,8 @@ func main() {
 
     diff := end - start;
 
-    fmt.Printf("puzzles: %d\n", count);
-    fmt.Printf("total time elapsed: %.6f\n", diff);
+    fmt.Printf("total puzz : %d\n", count);
+    fmt.Printf("total time : %.6f\n", diff);
 
     os.Exit(0)
 }

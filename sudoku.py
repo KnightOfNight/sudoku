@@ -155,8 +155,8 @@ def main():
 
     diff = end - start
 
-    print("puzzles: %d" % count)
-    print("total time elapsed: %.6f" % diff)
+    print("total puzz : %d" % count)
+    print("total time : %.6f" % diff)
             
     sys.exit(0)
 

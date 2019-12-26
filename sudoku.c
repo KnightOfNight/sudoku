@@ -259,8 +259,8 @@ int main(int argc, char *argv[]) {
 
     diff = end - start;
 
-    printf("puzzles: %d\n", count);
-    printf("total time elapsed: %.6f\n", diff);
+    printf("total puzz : %d\n", count);
+    printf("total time : %.6f\n", diff);
 
     return(0);
 }
