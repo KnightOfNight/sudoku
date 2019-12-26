@@ -44,7 +44,7 @@ class sudoku {
     public static int[] first_empty_square(int grid[][]) {
         for (int row = 0; row < SIZE; (row)++) {
             for (int col = 0; col < SIZE; (col)++) {
-                if (grid[row][col] == 0) {
+                if (grid[row][col] == UNASSIGNED) {
                     int rc[] = { row, col };
                     return rc;
                 }
@@ -53,6 +53,20 @@ class sudoku {
 
         int rc[] = { -1, -1 };
         return rc;
+    }
+
+    public static int count_empty_squares(int grid[][]) {
+        int count = 0;
+
+        for (int row = 0; row < SIZE; (row)++) {
+            for (int col = 0; col < SIZE; (col)++) {
+                if (grid[row][col] == UNASSIGNED) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
     public static boolean solve(int grid[][]) {
@@ -158,6 +172,7 @@ class sudoku {
     public static void timed_solve(int grid[][], boolean quiet) {
         if (! quiet) {
             System.out.printf("puzz : %s\n", grid_to_str(grid));
+            System.out.printf("empt : %d\n", count_empty_squares(grid));
         }
         double start = nanotime();
 
@@ -200,7 +215,7 @@ class sudoku {
 
         String grid_strs[];
         try {
-            grid_strs = read_grid_strs("sudoku.txt");
+            grid_strs = read_grid_strs("more-sudoku.txt");
         } catch(Exception e) {
             return;
         }
