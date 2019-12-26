@@ -47,23 +47,6 @@ def solve(grid):
 
     return False
 
-def nanotime():
-    return time.monotonic_ns() / 1000000000
-
-def timed_solve(grid, quiet):
-    start = nanotime()
-
-    if not solve(grid):
-        print("no solution")
-        return
-
-    end = nanotime()
-
-    diff = end - start
-
-    if not quiet:
-        print("time elapsed: %.6f" % diff)
-
 def str_to_grid(grid, grid_str):
     r = 0
     c = 0
@@ -78,12 +61,16 @@ def str_to_grid(grid, grid_str):
             c = 0
             r += 1
 
-def print_solution(grid):
-    sys.stdout.write("solution: ")
+def grid_to_str(grid):
+    grid_str = ""
     for r in range(_SIZE):
         for c in range(_SIZE):
-            sys.stdout.write(str(grid[r][c]))
-    print()
+            square = grid[r][c]
+            if square == _UNASSIGNED: 
+                grid_str += "."
+            else:
+                grid_str += str(square)
+    return grid_str
 
 def read_grid_strs(filename):
     lines = []
@@ -109,6 +96,28 @@ def read_grid_strs(filename):
 
     return lines
 
+def nanotime():
+    return time.monotonic_ns() / 1000000000
+
+def timed_solve(grid, quiet):
+    if not quiet:
+        print("puzz : %s" % grid_to_str(grid))
+
+    start = nanotime()
+
+    solved = solve(grid)
+
+    end = nanotime()
+
+    diff = end - start
+
+    if not quiet:
+        if solved:
+            print("solu : %s" % grid_to_str(grid))
+        else:
+            print("stat : not solved")
+        print("time : %.6f" % diff)
+
 def main():
     sample_grid = [ [5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], [0, 9, 8, 0, 0, 0, 0, 6, 0], [8, 0, 0, 0, 6, 0, 0, 0, 3], [4, 0, 0, 8, 0, 3, 0, 0, 1], [7, 0, 0, 0, 2, 0, 0, 0, 6], [0, 6, 0, 0, 0, 0, 2, 8, 0], [0, 0, 0, 4, 1, 9, 0, 0, 5], [0, 0, 0, 0, 8, 0, 0, 7, 9] ]
     empty_grid = [ [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], ]
@@ -120,9 +129,7 @@ def main():
 
     if args.sample:
         grid = sample_grid
-        print("puzzle: sample")
         timed_solve(grid, False)
-        print_solution(grid)
         sys.exit(0)
 
     grid_strs = read_grid_strs("sudoku.txt")
@@ -135,11 +142,7 @@ def main():
     for grid_str in grid_strs:
         grid = empty_grid
         str_to_grid(grid, grid_str)
-        if not args.quiet:
-            print("puzzle: %s" % grid_str)
         timed_solve(grid, args.quiet)
-        if not args.quiet:
-            print_solution(grid)
 
         end = nanotime()
 

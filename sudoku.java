@@ -80,31 +80,6 @@ class sudoku {
         return(false);
     }
 
-    public static double nanotime() {
-        long time = System.nanoTime();
-
-        double seconds = time / 1000000000.0;
-
-        return(seconds);
-    }
-
-    public static void timed_solve(int grid[][], boolean quiet) {
-        double start = nanotime();
-
-        if (! solve(grid)) {
-            System.out.printf("no solution\n");
-            return;
-        }
-
-        double end = nanotime();
-
-        double diff = end - start;
-
-        if (! quiet) {
-            System.out.printf("time elapsed: %.6f\n", diff);
-        }
-    }
-
     public static void str_to_grid(int grid[][], String grid_str) {
         int r = 0;
         int c = 0;
@@ -124,14 +99,19 @@ class sudoku {
         }
     }
 
-    public static void print_solution(int grid[][]) {
-        System.out.printf("solution: ");
+    public static String grid_to_str(int grid[][]) {
+        String grid_str = "";
         for (int r = 0; r < SIZE; r++) {
             for (int c = 0; c < SIZE; c++) {
-                System.out.printf("%d", grid[r][c]);
+                int square = grid[r][c];
+                if (square == UNASSIGNED) {
+                    grid_str = grid_str.concat(".");
+                } else {
+                    grid_str = grid_str.concat(Integer.toString(square));
+                }
             }
         }
-        System.out.printf("\n");
+        return(grid_str);
     }
 
     public static String[] read_grid_strs(String filename) throws Exception {
@@ -167,6 +147,36 @@ class sudoku {
         return(lines);
     }
 
+    public static double nanotime() {
+        long time = System.nanoTime();
+
+        double seconds = time / 1000000000.0;
+
+        return(seconds);
+    }
+
+    public static void timed_solve(int grid[][], boolean quiet) {
+        if (! quiet) {
+            System.out.printf("puzz : %s\n", grid_to_str(grid));
+        }
+        double start = nanotime();
+
+        boolean solved = solve(grid);
+
+        double end = nanotime();
+
+        double diff = end - start;
+
+        if (! quiet) {
+            if (solved) {
+                System.out.printf("puzz : %s\n", grid_to_str(grid));
+            } else {
+                System.out.printf("stat : not solved\n");
+            }
+            System.out.printf("time : %.6f\n", diff);
+        }
+    }
+
     public static void main(String args[]) {
         int sample_grid[][] = { {5, 3, 0, 0, 7, 0, 0, 0, 0}, {6, 0, 0, 1, 9, 5, 0, 0, 0}, {0, 9, 8, 0, 0, 0, 0, 6, 0}, {8, 0, 0, 0, 6, 0, 0, 0, 3}, {4, 0, 0, 8, 0, 3, 0, 0, 1}, {7, 0, 0, 0, 2, 0, 0, 0, 6}, {0, 6, 0, 0, 0, 0, 2, 8, 0}, {0, 0, 0, 4, 1, 9, 0, 0, 5}, {0, 0, 0, 0, 8, 0, 0, 7, 9} };
         int empty_grid[][] = { {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0} };
@@ -184,9 +194,7 @@ class sudoku {
 
         if (sample) {
             grid = sample_grid;
-            System.out.printf("puzzle: sample\n");
             timed_solve(grid, false);
-            print_solution(grid);
             return;
         }
 
@@ -205,13 +213,7 @@ class sudoku {
             grid = empty_grid;
             String line = grid_strs[i];
             str_to_grid(grid, line);
-            if (! quiet) {
-                System.out.printf("puzzle: %s\n", line);
-            }
             timed_solve(grid, quiet);
-            if (! quiet) {
-                print_solution(grid);
-            }
         }
 
         double end = nanotime();

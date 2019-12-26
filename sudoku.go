@@ -81,27 +81,6 @@ func solve(grid [][]int) bool {
     return false
 }
 
-func nanotime() float64 {
-    return float64(time.Now().UnixNano()) / 1000000000.0
-}
-
-func timed_solve(grid [][]int, quiet bool) {
-    start := nanotime()
-
-    if ! solve(grid) {
-        fmt.Println("no solution")
-        return
-    }
-
-    end := nanotime()
-
-    diff := end - start
-
-    if ! quiet {
-        fmt.Printf("time elapsed: %.6f\n", diff)
-    }
-}
-
 func str_to_grid(grid [][]int, grid_str string) {
     r := 0
     c := 0
@@ -121,14 +100,19 @@ func str_to_grid(grid [][]int, grid_str string) {
     }
 }
 
-func print_solution(grid [][]int) {
-    fmt.Printf("solution: ")
+func grid_to_str(grid [][]int) string {
+    var grid_str string
     for r := 0; r < SIZE; r++ {
         for c := 0; c < SIZE; c++ {
-            fmt.Printf("%d", grid[r][c])
+            square := grid[r][c]
+            if square == UNASSIGNED {
+                grid_str += "."
+            } else {
+                grid_str += strconv.Itoa(square)
+            }
         }
     }
-    fmt.Printf("\n")
+    return grid_str
 }
 
 func read_grid_strs(filename string) []string {
@@ -164,6 +148,33 @@ func read_grid_strs(filename string) []string {
     return lines
 }
 
+func nanotime() float64 {
+    return float64(time.Now().UnixNano()) / 1000000000.0
+}
+
+func timed_solve(grid [][]int, quiet bool) {
+    if ! quiet {
+        fmt.Printf("puzz : %s\n", grid_to_str(grid))
+    }
+
+    start := nanotime()
+
+    solved := solve(grid)
+
+    end := nanotime()
+
+    diff := end - start
+
+    if ! quiet {
+        if solved {
+            fmt.Printf("solu : %s\n", grid_to_str(grid))
+        } else {
+            fmt.Printf("stat : not solved\n")
+        }
+        fmt.Printf("time : %.6f\n", diff)
+    }
+}
+
 func main() {
     sample_grid := [][]int { {5, 3, 0, 0, 7, 0, 0, 0, 0}, {6, 0, 0, 1, 9, 5, 0, 0, 0}, {0, 9, 8, 0, 0, 0, 0, 6, 0}, {8, 0, 0, 0, 6, 0, 0, 0, 3}, {4, 0, 0, 8, 0, 3, 0, 0, 1}, {7, 0, 0, 0, 2, 0, 0, 0, 6}, {0, 6, 0, 0, 0, 0, 2, 8, 0}, {0, 0, 0, 4, 1, 9, 0, 0, 5}, {0, 0, 0, 0, 8, 0, 0, 7, 9}, }
     empty_grid := [][]int { {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, }
@@ -181,9 +192,7 @@ func main() {
 
     if sample {
         grid := sample_grid
-        fmt.Printf("puzzle: sample\n")
         timed_solve(grid, false)
-        print_solution(grid)
         os.Exit(0)
     }
 
@@ -196,13 +205,7 @@ func main() {
     for _,line := range grid_strs {
         grid := empty_grid
         str_to_grid(grid, line)
-        if ! quiet {
-            fmt.Printf("puzzle: %s\n", line)
-        }
         timed_solve(grid, quiet)
-        if ! quiet {
-            print_solution(grid)
-        }
     }
 
     end := nanotime()

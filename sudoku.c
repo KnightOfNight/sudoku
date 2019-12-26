@@ -78,36 +78,6 @@ int solve(int grid[SIZE][SIZE]) {
     return(0);
 }
 
-double nanotime() {
-    struct timespec tsp;
-    double secs;
-
-    clock_gettime(CLOCK_MONOTONIC, &tsp);
-
-    secs = (double)tsp.tv_sec + ((double)tsp.tv_nsec / 1000000000.0);
-
-    return(secs);
-}
-
-void timed_solve(int grid[SIZE][SIZE], int quiet) {
-    double start, end, diff;
-
-    start = nanotime();
-
-    if (! solve(grid)) {
-        printf("no solution\n");
-        return;
-    }
-
-    end = nanotime();
-
-    diff = end - start;
-
-    if (! quiet) {
-        printf("time elapsed: %.6f\n", diff);
-    }
-}
-
 void str_to_grid(int grid[SIZE][SIZE], char grid_str[256]) {
     int r = 0;
     int c = 0;
@@ -128,14 +98,19 @@ void str_to_grid(int grid[SIZE][SIZE], char grid_str[256]) {
     }
 }
 
-void print_solution(int grid[SIZE][SIZE]) {
-    printf("solution: ");
+void grid_to_str(char grid_str[256], int grid[SIZE][SIZE]) {
+    int square;
     for (int r = 0; r < SIZE; r++) {
         for (int c = 0; c < SIZE; c++) {
-            printf("%d", grid[r][c]);
+            square = grid[r][c];
+            if (square == UNASSIGNED) {
+                grid_str[(r * SIZE) + c] = '.';
+            } else {
+                grid_str[(r * SIZE) + c] = square + '0';
+            }
         }
     }
-    printf("\n");
+    grid_str[TOTAL_SIZE] = '\0';
 }
 
 char** read_grid_strs(char *filename, int *count) {
@@ -193,6 +168,46 @@ char** read_grid_strs(char *filename, int *count) {
     return(lines);
 }
 
+double nanotime() {
+    struct timespec tsp;
+    double secs;
+
+    clock_gettime(CLOCK_MONOTONIC, &tsp);
+
+    secs = (double)tsp.tv_sec + ((double)tsp.tv_nsec / 1000000000.0);
+
+    return(secs);
+}
+
+void timed_solve(int grid[SIZE][SIZE], int quiet) {
+    double start, end, diff;
+    int solved = 0;
+    char grid_str[256];
+
+    if (! quiet) {
+        grid_to_str(grid_str, grid);
+        printf("puzz : %s\n", grid_str);
+    }
+
+    start = nanotime();
+
+    solved = solve(grid);
+
+    end = nanotime();
+
+    diff = end - start;
+
+    if (! quiet) {
+        if (solved) {
+            grid_to_str(grid_str, grid);
+            printf("solu : %s\n", grid_str);
+        } else {
+            printf("stat : not solved\n");
+        }
+        printf("time : %.6f\n", diff);
+    }
+}
+
 int main(int argc, char *argv[]) {
     int sample_grid[SIZE][SIZE] = { {5, 3, 0, 0, 7, 0, 0, 0, 0}, {6, 0, 0, 1, 9, 5, 0, 0, 0}, {0, 9, 8, 0, 0, 0, 0, 6, 0}, {8, 0, 0, 0, 6, 0, 0, 0, 3}, {4, 0, 0, 8, 0, 3, 0, 0, 1}, {7, 0, 0, 0, 2, 0, 0, 0, 6}, {0, 6, 0, 0, 0, 0, 2, 8, 0}, {0, 0, 0, 4, 1, 9, 0, 0, 5}, {0, 0, 0, 0, 8, 0, 0, 7, 9} };
     int empty_grid[SIZE][SIZE] = { {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0} };
@@ -218,9 +233,7 @@ int main(int argc, char *argv[]) {
                 grid[r][c] = sample_grid[r][c];
             }
         }
-        printf("puzzle: sample\n");
         timed_solve(grid, 0);
-        print_solution(grid);
         return(0);
     }
 
@@ -239,13 +252,7 @@ int main(int argc, char *argv[]) {
         }
         grid_str = grid_strs[i];
         str_to_grid(grid, grid_str);
-        if (! quiet) {
-            printf("puzzle: %s\n", grid_str);
-        }
         timed_solve(grid, quiet);
-        if (! quiet) {
-            print_solution(grid);
-        }
     }
 
     end = nanotime();
