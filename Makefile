@@ -64,7 +64,7 @@ cleanreports:
 # alias
 quicktest: sample
 # sample run
-sample: all
+sample: binaries
 	@echo "sample puzzle test"
 	@echo "language: c"
 	@./csudoku --sample
