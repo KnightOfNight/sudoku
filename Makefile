@@ -1,51 +1,53 @@
+# default - binaries
+default: binaries
 
-# binaries
+# all binaries
 binaries: csudoku gsudoku jsudoku psudoku
 
-# reports
+# all reports
 reports: c-sol.txt g-sol.txt j-sol.txt p-sol.txt
 
 # everything 
 all: binaries reports
 
-# binary
+# single binary
 csudoku: sudoku.c
 	@echo "compiling csudoku"
 	@cc -o csudoku -Wall sudoku.c
 	@rm -f c-sol.txt 2>/dev/null
-# binary
+# single binary
 gsudoku: sudoku.go
 	@echo "compiling gsudoku"
 	@go build -o gsudoku sudoku.go
 	@rm -f g-sol.txt 2>/dev/null
-# alias
+# alias to sudoku.class
 jsudoku: sudoku.class
-# binary
+# single binary
 sudoku.class: sudoku.java
 	@echo "compiling jsudoku"
 	@javac sudoku.java
 	@rm -f j-sol.txt 2>/dev/null
-# alias
+# alias to sudoku.pyc
 psudoku: sudoku.pyc
-# binary
+# single binary
 sudoku.pyc: sudoku.py
 	@echo "compiling psudoku"
 	@python3 -c "import py_compile; py_compile.compile('sudoku.py', cfile='sudoku.pyc', doraise=True)"
 	@rm -f p-sol.txt 2>/dev/null
 
-# report file
+# single report file
 c-sol.txt: csudoku
 	@echo "getting csudoku report"
 	@./csudoku > c-sol.txt
-# report file
+# single report file
 g-sol.txt: gsudoku
 	@echo "getting gsudoku report"
 	@./gsudoku > g-sol.txt
-# report file
+# single report file
 j-sol.txt: jsudoku
 	@echo "getting jsudoku report"
 	@./jsudoku > j-sol.txt
-# report file
+# single report file
 p-sol.txt: psudoku
 	@echo "getting psudoku report"
 	@./psudoku > p-sol.txt
@@ -61,9 +63,11 @@ cleanreports:
 	@echo "removing reports"
 	@rm -vf *-sol.txt 2>/dev/null
 
-# alias
+# alias to sample
 quicktest: sample
-# sample run
+# alias to report
+slowtest: report
+# sample report run
 sample: binaries
 	@echo "sample puzzle test"
 	@echo "language: c"
@@ -74,7 +78,7 @@ sample: binaries
 	@./jsudoku --sample
 	@echo "language: python"
 	@./psudoku --sample
-# summary report
+# full report run
 report: all reports
 	@echo "summary report"
 	@echo "language: c"
@@ -103,4 +107,4 @@ code:
 
 # list all targets
 list:
-	@egrep -B 1 -e "^[a-zA-Z]" Makefile | cut -f 1 -d :
+	@egrep -B 1 -e "^[a-zA-Z]" Makefile | cut -f 1 -d : | sed -e "s/--//"
