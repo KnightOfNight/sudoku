@@ -194,28 +194,9 @@ char** read_grid_strs(char *filename, int *count) {
 }
 
 int main(int argc, char *argv[]) {
-    int sample_grid[SIZE][SIZE] = {
-        {5, 3, 0, 0, 7, 0, 0, 0, 0},
-        {6, 0, 0, 1, 9, 5, 0, 0, 0},
-        {0, 9, 8, 0, 0, 0, 0, 6, 0},
-        {8, 0, 0, 0, 6, 0, 0, 0, 3},
-        {4, 0, 0, 8, 0, 3, 0, 0, 1},
-        {7, 0, 0, 0, 2, 0, 0, 0, 6},
-        {0, 6, 0, 0, 0, 0, 2, 8, 0},
-        {0, 0, 0, 4, 1, 9, 0, 0, 5},
-        {0, 0, 0, 0, 8, 0, 0, 7, 9}
-    };
-    int grid[SIZE][SIZE] = {
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0}
-    };
+    int sample_grid[SIZE][SIZE] = { {5, 3, 0, 0, 7, 0, 0, 0, 0}, {6, 0, 0, 1, 9, 5, 0, 0, 0}, {0, 9, 8, 0, 0, 0, 0, 6, 0}, {8, 0, 0, 0, 6, 0, 0, 0, 3}, {4, 0, 0, 8, 0, 3, 0, 0, 1}, {7, 0, 0, 0, 2, 0, 0, 0, 6}, {0, 6, 0, 0, 0, 0, 2, 8, 0}, {0, 0, 0, 4, 1, 9, 0, 0, 5}, {0, 0, 0, 0, 8, 0, 0, 7, 9} };
+    int empty_grid[SIZE][SIZE] = { {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0} };
+    int grid[SIZE][SIZE];
     int sample = 0;
     int quiet = 0;
     int count = 0;
@@ -232,9 +213,14 @@ int main(int argc, char *argv[]) {
     }
 
     if (sample) {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                grid[r][c] = sample_grid[r][c];
+            }
+        }
         printf("puzzle: sample\n");
-        timed_solve(sample_grid, 0);
-        print_solution(sample_grid);
+        timed_solve(grid, 0);
+        print_solution(grid);
         return(0);
     }
 
@@ -246,6 +232,11 @@ int main(int argc, char *argv[]) {
     start = nanotime();
 
     for (int i = 0; i < count; i++) {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                grid[r][c] = empty_grid[r][c];
+            }
+        }
         grid_str = grid_strs[i];
         str_to_grid(grid, grid_str);
         if (! quiet) {

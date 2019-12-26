@@ -168,32 +168,11 @@ class sudoku {
     }
 
     public static void main(String args[]) {
+        int sample_grid[][] = { {5, 3, 0, 0, 7, 0, 0, 0, 0}, {6, 0, 0, 1, 9, 5, 0, 0, 0}, {0, 9, 8, 0, 0, 0, 0, 6, 0}, {8, 0, 0, 0, 6, 0, 0, 0, 3}, {4, 0, 0, 8, 0, 3, 0, 0, 1}, {7, 0, 0, 0, 2, 0, 0, 0, 6}, {0, 6, 0, 0, 0, 0, 2, 8, 0}, {0, 0, 0, 4, 1, 9, 0, 0, 5}, {0, 0, 0, 0, 8, 0, 0, 7, 9} };
+        int empty_grid[][] = { {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0} };
+        int grid[][];
         boolean sample = false;
         boolean quiet = false;
-
-        int sample_grid[][] = {
-            {5, 3, 0, 0, 7, 0, 0, 0, 0},
-            {6, 0, 0, 1, 9, 5, 0, 0, 0},
-            {0, 9, 8, 0, 0, 0, 0, 6, 0},
-            {8, 0, 0, 0, 6, 0, 0, 0, 3},
-            {4, 0, 0, 8, 0, 3, 0, 0, 1},
-            {7, 0, 0, 0, 2, 0, 0, 0, 6},
-            {0, 6, 0, 0, 0, 0, 2, 8, 0},
-            {0, 0, 0, 4, 1, 9, 0, 0, 5},
-            {0, 0, 0, 0, 8, 0, 0, 7, 9}
-        };
-
-        int grid[][] = {
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0}
-        };
 
         if (args.length > 0) {
             if (args[0].equals("--sample")) {
@@ -204,9 +183,10 @@ class sudoku {
         }
 
         if (sample) {
+            grid = sample_grid;
             System.out.printf("puzzle: sample\n");
-            timed_solve(sample_grid, false);
-            print_solution(sample_grid);
+            timed_solve(grid, false);
+            print_solution(grid);
             return;
         }
 
@@ -222,6 +202,7 @@ class sudoku {
         double start = nanotime();
 
         for (int i = 0; i < grid_strs.length; i++) {
+            grid = empty_grid;
             String line = grid_strs[i];
             str_to_grid(grid, line);
             if (! quiet) {
