@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/time.h>
 
 #define SIZE 9
-#define UNIT 3
+#define UNIT (SIZE / 3)
+#define TOTAL_SIZE (SIZE * SIZE)
 #define UNASSIGNED 0
 
 int in_row(int grid[SIZE][SIZE], int row, int num) {
@@ -110,12 +111,14 @@ void timed_solve(int grid[SIZE][SIZE], int quiet) {
 void str_to_grid(int grid[SIZE][SIZE], char grid_str[256]) {
     int r = 0;
     int c = 0;
+    char square;
 
-    for (int i = 0; i < (SIZE * SIZE); i++) {
-        if (grid_str[i] == '.') {
+    for (int i = 0; i < TOTAL_SIZE; i++) {
+        square = grid_str[i];
+        if (square == '.') {
             grid[r][c] = UNASSIGNED;
         } else {
-            grid[r][c] = grid_str[i] - '0';
+            grid[r][c] = square - '0';
         }
         c++;
         if (c == SIZE) {
@@ -133,6 +136,61 @@ void print_solution(int grid[SIZE][SIZE]) {
         }
     }
     printf("\n");
+}
+
+char** read_grid_strs(char *filename, int *count) {
+    FILE *file = NULL;
+    char line[256];
+    char **lines = NULL;
+    char **new_lines = NULL;
+    char square;
+    int num = 0;
+    int ct = 0;
+
+    lines = malloc(0);
+
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("ERROR: unable to open file '%s'\n", filename);
+        return(NULL);
+    }
+
+    ct = 0;
+    while (fgets(line, 256, file)) {
+        if (line[strlen(line) - 1] == '\n') {
+            line[strlen(line) - 1] = '\0';
+        }
+
+        if (strlen(line) != TOTAL_SIZE) {
+            printf("ERROR: incorrect length %lu, invalid line '%s'\n", strlen(line), line);
+            exit(1);
+        }
+
+        for (int i = 0; i < TOTAL_SIZE; i++) {
+            square = line[i];
+
+            if (square == '.') {
+                continue;
+            }
+
+            num = square - '0';
+            if ((num < 1) || (num > SIZE)) {
+                printf("ERROR: incorrect character '%c' at index %d, invalid line '%s'\n", square, i, line);
+                exit(1);
+            }
+        }
+
+        new_lines = realloc(lines, (ct + 1) * sizeof(char*));
+        lines = new_lines;
+        lines[ct] = malloc((TOTAL_SIZE + 1) * sizeof(char));
+        strcpy(lines[ct], line);
+
+        ct++;
+    }
+
+    (*count) = ct;
+
+    return(lines);
 }
 
 int main(int argc, char *argv[]) {
@@ -158,10 +216,12 @@ int main(int argc, char *argv[]) {
         {0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0}
     };
-    FILE* file;
-    char line[256];
     int sample = 0;
     int quiet = 0;
+    int count = 0;
+    char **grid_strs = NULL;
+    char *grid_str = NULL;
+    double start, end, diff;
 
     if (argc > 1) {
         if (! strcmp(argv[1], "--sample")) {
@@ -178,21 +238,31 @@ int main(int argc, char *argv[]) {
         return(0);
     }
 
-    file = fopen("sudoku.txt", "r");
-    if (file == NULL) {
-        printf("ERROR: unable to open file\n");
-        return(1);
-    }
-    while (fgets(line, sizeof(line), file)) {
-        str_to_grid(grid, line);
+    grid_strs = read_grid_strs("sudoku.txt", &count);
+    if (grid_strs == NULL) {
+        exit(1);
+    };
+
+    start = nanotime();
+
+    for (int i = 0; i < count; i++) {
+        grid_str = grid_strs[i];
+        str_to_grid(grid, grid_str);
         if (! quiet) {
-            printf("puzzle: %s", line);
+            printf("puzzle: %s\n", grid_str);
         }
         timed_solve(grid, quiet);
         if (! quiet) {
             print_solution(grid);
         }
     }
+
+    end = nanotime();
+
+    diff = end - start;
+
+    printf("puzzles: %d\n", count);
+    printf("total time elapsed: %.6f\n", diff);
 
     return(0);
 }

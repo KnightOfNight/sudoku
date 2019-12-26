@@ -1,8 +1,9 @@
-import java.nio.file.*;;
+import java.nio.file.*;
 
 class sudoku {
     final static int SIZE = 9;
-    final static int UNIT = 3;
+    final static int UNIT = SIZE / 3;
+    final static int TOTAL_SIZE = SIZE * SIZE;
     final static int UNASSIGNED = 0;
 
     public static boolean in_row(int grid[][], int row, int num) {
@@ -108,11 +109,12 @@ class sudoku {
         int r = 0;
         int c = 0;
 
-        for (int i = 0; i < (SIZE * SIZE); i++) {
-            if (grid_str.charAt(i) == '.') {
+        for (int i = 0; i < TOTAL_SIZE; i++) {
+            char square = grid_str.charAt(i);
+            if (square == '.') {
                 grid[r][c] = UNASSIGNED;
             } else {
-                grid[r][c] = Character.getNumericValue(grid_str.charAt(i));
+                grid[r][c] = Character.getNumericValue(square);
             }
             c++;
             if (c == SIZE) {
@@ -132,10 +134,36 @@ class sudoku {
         System.out.printf("\n");
     }
 
-    public static String[] readlines(String filename) throws Exception {
+    public static String[] read_grid_strs(String filename) throws Exception {
         String line = new String(Files.readAllBytes(Paths.get(filename)));
+
         line = line.trim();
+
         String lines[] = line.split("\n");
+
+        for (int l = 0; l < lines.length; l++) {
+            line = lines[l];
+
+            if (line.length() != TOTAL_SIZE) {
+                System.out.printf("ERROR: incorrect length %d, invalid line '%s'\n", line.length(), line);
+                System.exit(1);
+            }
+
+            for (int i = 0; i < TOTAL_SIZE; i++) {
+                char square = line.charAt(i);
+
+                if (square == '.') {
+                    continue;
+                }
+
+                int num = Character.getNumericValue(square);
+                if ((num < 1) || (num > SIZE)) {
+                    System.out.printf("ERROR: incorrect character '%c' at index %d, invalid line '%s'\n", square, i, line);
+                    System.exit(1);
+                }
+            }
+        }
+
         return(lines);
     }
 
@@ -182,15 +210,19 @@ class sudoku {
             return;
         }
 
-        String lines[];
+        String grid_strs[];
         try {
-            lines = readlines("sudoku.txt");
+            grid_strs = read_grid_strs("sudoku.txt");
         } catch(Exception e) {
             return;
         }
 
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
+        int count = grid_strs.length;
+
+        double start = nanotime();
+
+        for (int i = 0; i < grid_strs.length; i++) {
+            String line = grid_strs[i];
             str_to_grid(grid, line);
             if (! quiet) {
                 System.out.printf("puzzle: %s\n", line);
@@ -200,6 +232,13 @@ class sudoku {
                 print_solution(grid);
             }
         }
+
+        double end = nanotime();
+
+        double diff = end - start;
+
+        System.out.printf("puzzles: %d\n", count);
+        System.out.printf("total time elapsed: %.6f\n", diff);
 
         return;
     }

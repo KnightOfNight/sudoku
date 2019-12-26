@@ -3,7 +3,8 @@ import sys
 import time
 
 _SIZE = 9
-_UNIT = 3
+_UNIT = int(_SIZE / 3)
+_TOTAL_SIZE = _SIZE * _SIZE
 _UNASSIGNED = 0
 
 def in_row(grid, row, num):
@@ -66,11 +67,12 @@ def timed_solve(grid, quiet):
 def str_to_grid(grid, grid_str):
     r = 0
     c = 0
-    for i in range(_SIZE * _SIZE):
-        if grid_str[i] == ".":
+    for i in range(_TOTAL_SIZE):
+        square = grid_str[i]
+        if square == ".":
             grid[r][c] = _UNASSIGNED
         else:
-            grid[r][c] = int(grid_str[i])
+            grid[r][c] = int(square)
         c += 1
         if c == _SIZE:
             c = 0
@@ -82,6 +84,30 @@ def print_solution(grid):
         for c in range(_SIZE):
             sys.stdout.write(str(grid[r][c]))
     print()
+
+def read_grid_strs(filename):
+    lines = []
+
+    with open(filename, "r") as f:
+        lines = [ l.strip() for l in f.readlines() ]
+
+    for line in lines:
+        if len(line) != _TOTAL_SIZE:
+            print("ERROR: incorrect length %d, invalid line '%s'" % (len(line), line))
+            sys.exit(1)
+
+        for i in range(_TOTAL_SIZE):
+            square = line[i]
+            if square == ".":
+                continue
+            try:
+                num = int(square)
+                continue
+            except ValueError:
+                print("ERROR: incorrect character '%s' at index %d, invalid line '%s'" % (square, i, line))
+                sys.exit(1)
+
+    return lines
 
 def main():
     sample_grid = [
@@ -119,14 +145,34 @@ def main():
         print_solution(sample_grid)
         sys.exit(0)
 
-    with open("sudoku.txt", "r") as f:
-        for line in f.readlines():
-            str_to_grid(grid, line)
-            if not args.quiet:
-                print("puzzle: %s" % line.strip())
-            timed_solve(grid, args.quiet)
-            if not args.quiet:
-                print_solution(grid)
+    grid_strs = read_grid_strs("sudoku.txt")
+
+    count = len(grid_strs)
+
+    start = nanotime()
+
+    count = 0
+    for grid_str in grid_strs:
+        str_to_grid(grid, grid_str)
+        if not args.quiet:
+            print("puzzle: %s" % grid_str)
+        timed_solve(grid, args.quiet)
+        if not args.quiet:
+            print_solution(grid)
+
+        end = nanotime()
+
+        count += 1
+
+        if (end - start) > 10:
+            break
+
+    end = nanotime()
+
+    diff = end - start
+
+    print("puzzles: %d" % count)
+    print("total time elapsed: %.6f" % diff)
             
     sys.exit(0)
 
