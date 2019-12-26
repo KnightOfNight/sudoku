@@ -45,7 +45,7 @@ int in_unit(int grid[SIZE][SIZE], int row, int col, int num) {
 int first_empty_square(int grid[SIZE][SIZE], int *row, int *col) {
     for (*row = 0; *row < SIZE; (*row)++) {
         for (*col = 0; *col < SIZE; (*col)++) {
-            if (grid[*row][*col] == 0) {
+            if (grid[*row][*col] == UNASSIGNED) {
                 return(1);
             }
         }
