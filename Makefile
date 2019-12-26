@@ -73,7 +73,7 @@ cleanreports:
 
 # alias to sample
 quicktest: sample
-# sample report run
+# sample test report
 sample: binaries
 	@echo "sample test report"
 	@echo
@@ -90,8 +90,8 @@ sample: binaries
 	@./psudoku --sample
 
 # alias to report
-slowtest: report
-# full report run
+fulltest: report
+# full test report
 report: binaries reports
 	@echo "full test report"
 	@echo
