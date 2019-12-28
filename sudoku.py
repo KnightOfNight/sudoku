@@ -1,4 +1,6 @@
 import argparse
+import copy
+import random
 import sys
 import time
 
@@ -28,6 +30,14 @@ def first_empty_square(grid):
                 return (r, c)
     return (None, None)
 
+def count_empty_squares(grid):
+    count = 0
+    for r in range(len(grid)):
+        for c in range(len(grid[r])):
+            if grid[r][c] == _UNASSIGNED:
+                count += 1
+    return count
+
 def solve(grid):
     (r, c) = first_empty_square(grid)
 
@@ -44,6 +54,61 @@ def solve(grid):
             return True
 
         grid[r][c] = _UNASSIGNED
+
+    return False
+
+def uniqsolve(grid, level=0, solutions=0, start_row=None, start_col=None):
+    r = 0
+    c = 0
+    if start_row and start_col:
+        r = start_row
+        c = start_col
+    else:
+        (r, c) = first_empty_square(grid)
+
+    if r is None:
+        return 1
+
+    this_solutions = 0
+    for num in range(1, _SIZE + 1):
+        if in_row(grid, r, num) or in_col(grid, c, num) or in_unit(grid, r, c, num):
+            continue
+
+        gridcopy = copy.deepcopy(grid)
+
+        gridcopy[r][c] = num
+
+        this_solutions += uniqsolve(gridcopy, level=level+1, solutions=solutions)
+
+        if this_solutions > 1:
+            break
+
+    return this_solutions
+
+def randsolve(grid):
+    (r, c) = first_empty_square(grid)
+
+    if r is None:
+        return True
+
+    nums_tried = []
+    while True:
+        num = random.randint(1, _SIZE)
+
+        if num in nums_tried:
+            continue
+
+        nums_tried.append(num)
+
+        if not in_row(grid, r, num) and not in_col(grid, c, num) and not in_unit(grid, r, c, num):
+            grid[r][c] = num
+            if randsolve(grid):
+                return True
+            grid[r][c] = _UNASSIGNED
+
+        if len(nums_tried) == _SIZE:
+            num = 0
+            break
 
     return False
 
@@ -99,24 +164,74 @@ def read_grid_strs(filename):
 def nanotime():
     return time.monotonic_ns() / 1000000000
 
-def timed_solve(grid, quiet):
+def timed_solve(grid, quiet=False):
     if not quiet:
         print("puzz : %s" % grid_to_str(grid))
+        print("empt : %d" % count_empty_squares(grid));
 
     start = nanotime()
 
-    solved = solve(grid)
+    solved = uniqsolve(grid)
 
     end = nanotime()
 
     diff = end - start
 
     if not quiet:
-        if solved:
+        if solved == 1:
             print("solu : %s" % grid_to_str(grid))
+        elif solved > 1:
+            print("solu : multiple")
         else:
-            print("stat : not solved")
+            print("solu : none")
         print("time : %.6f" % diff)
+
+def generate():
+    grid = [ [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], ]
+
+    if not randsolve(grid):
+        print("ERROR: unable to make grid")
+        sys.exit(1)
+
+    orig_sol = grid_to_str(grid)
+    print("orig : %s" % (orig_sol))
+
+    count = 0
+    max_empty = random.randint(4, 50)
+    max_empty = 50
+    while True:
+        r = random.randrange(_SIZE)
+        c = random.randrange(_SIZE)
+
+        if grid[r][c] == _UNASSIGNED:
+            continue
+
+        gridcopy = copy.deepcopy(grid)
+        gridcopy[r][c] = _UNASSIGNED
+
+        solved = uniqsolve(gridcopy, start_row=r, start_col=c)
+        if solved == 1:
+            grid[r][c] = _UNASSIGNED
+            count += 1
+
+        if count == max_empty:
+            break
+
+    print("puzz : %s" % (grid_to_str(grid)))
+    solved = uniqsolve(grid)
+    if solved > 1:
+        print("ERROR: invalid puzzie, multiple solutions")
+        sys.exit(1)
+    elif solved > 0:
+        solve(grid)
+        print("solu : %s" % (grid_to_str(grid)))
+        if grid_to_str(grid) != orig_sol:
+            print("ERROR: invalid puzzle, solutions don't match")
+            sys.exit(1)
+    else:
+        print("solu : none")
+
+    return grid
 
 def main():
     sample_grid = [ [5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], [0, 9, 8, 0, 0, 0, 0, 6, 0], [8, 0, 0, 0, 6, 0, 0, 0, 3], [4, 0, 0, 8, 0, 3, 0, 0, 1], [7, 0, 0, 0, 2, 0, 0, 0, 6], [0, 6, 0, 0, 0, 0, 2, 8, 0], [0, 0, 0, 4, 1, 9, 0, 0, 5], [0, 0, 0, 0, 8, 0, 0, 7, 9] ]
@@ -125,11 +240,18 @@ def main():
     parser = argparse.ArgumentParser(description="Solve sudoku")
     parser.add_argument("--sample", action="store_true", help="Solve a sample puzzle then exit")
     parser.add_argument("--quiet", action="store_true", help="Quiet output")
+    parser.add_argument("--generate", action="store_true", help="Generate puzzle")
     args = parser.parse_args()
 
     if args.sample:
         grid = sample_grid
         timed_solve(grid, False)
+        sys.exit(0)
+
+    if args.generate:
+        for i in range(10000):
+            grid = generate()
+#            timed_solve(grid, args.quiet)
         sys.exit(0)
 
     grid_strs = read_grid_strs("sudoku.txt")
